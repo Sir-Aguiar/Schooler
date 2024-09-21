@@ -1,0 +1,4 @@
+name: Schooler
+version: '1.0-SNAPSHOT'
+main: org.aguiar.schooler.Schooler
+api-version: '1.20'
