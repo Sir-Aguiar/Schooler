@@ -1,16 +1,17 @@
 package org.aguiar.schooler.utils;
 
+import org.aguiar.schooler.records.Claim;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class ClaimsStateManager {
+  private final ClaimsManager claimsManager;
   public Map<UUID, List<Block>> clickedSequence = new HashMap<>();
-  public Map<UUID, int[][]> claimedBlocks = new HashMap<>();
 
-  public ClaimsStateManager() {
-
+  public ClaimsStateManager(ClaimsManager claimsManager) {
+    this.claimsManager = claimsManager;
   }
 
   public void stopClickSequence(Player player) {
@@ -31,14 +32,13 @@ public class ClaimsStateManager {
       clickedSequence.put(player.getUniqueId(), blockList);
     }
 
-    if (blockList.size() < 2) {
+    if (blockList.size() < 2 && !blockList.contains(clickedBlock)) {
       blockList.add(clickedBlock);
 
       if (blockList.size() == 2) {
         claimBlocks(player);
       }
     }
-
   }
 
   public boolean isPlayerInSequence(Player player) {
@@ -46,8 +46,6 @@ public class ClaimsStateManager {
   }
 
   public void claimBlocks(Player player) {
-    // This alg is AI auxiliated so need to be enhanced
-
     List<Block> blockList = clickedSequence.get(player.getUniqueId());
 
     int minX = Math.min(blockList.get(0).getX(), blockList.get(1).getX());
@@ -55,16 +53,10 @@ public class ClaimsStateManager {
     int minZ = Math.min(blockList.get(0).getZ(), blockList.get(1).getZ());
     int maxZ = Math.max(blockList.get(0).getZ(), blockList.get(1).getZ());
 
-    List<int[]> claimedBlockList = new ArrayList<>();
+    int[][] claimedBlocks = {{minX, maxX}, {minZ, maxZ}};
+    Claim newClaim = new Claim(UUID.randomUUID().toString(), claimedBlocks);
 
-    for (int x = minX; x <= maxX; x++) {
-      for (int z = minZ; z <= maxZ; z++) {
-        claimedBlockList.add(new int[]{x, z});
-      }
-    }
-
-    claimedBlocks.put(player.getUniqueId(), claimedBlockList.toArray(new int[0][0]));
-
+    this.claimsManager.updatePlayerClaims(player, newClaim);
 
     stopClickSequence(player);
   }

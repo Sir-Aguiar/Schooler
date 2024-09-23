@@ -40,8 +40,6 @@ public class BlocksClaim implements Listener {
     } else {
       claimsStateManager.startClickSequence(player, clickedBlock);
     }
-
-
   }
 
 
