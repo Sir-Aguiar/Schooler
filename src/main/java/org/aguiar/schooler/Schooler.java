@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public final class Schooler extends JavaPlugin {
-  private final ClaimsManager claimsManager = new ClaimsManager(this);
+  public final ClaimsManager claimsManager = new ClaimsManager(this);
   private final ClaimsStateManager claimsStateManager = new ClaimsStateManager(claimsManager);
   private final String ENABLED_MESSAGE = String.format("[%s] - PLUGIN ENABLED", getName());
   private final String DISABLED_MESSAGE = String.format("[%s] - PLUGIN DISABLED", getName());
@@ -29,7 +29,7 @@ public final class Schooler extends JavaPlugin {
 
 
   private void toggleEvents() {
-    Bukkit.getPluginManager().registerEvents(new BlocksClaim(claimsStateManager), this);
+    Bukkit.getPluginManager().registerEvents(new BlocksClaim(claimsStateManager, claimsManager), this);
 
     Bukkit.getConsoleSender().sendMessage(String.format("[%s] - ALL EVENTS LOADED", getName()));
   }

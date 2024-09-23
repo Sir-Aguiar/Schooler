@@ -1,7 +1,10 @@
 package org.aguiar.schooler.events;
 
+import org.aguiar.schooler.records.Claim;
+import org.aguiar.schooler.utils.ClaimsManager;
 import org.aguiar.schooler.utils.ClaimsStateManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -10,13 +13,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 public class BlocksClaim implements Listener {
   private final ClaimsStateManager claimsStateManager;
+  private final ClaimsManager claimsManager;
 
-  public BlocksClaim(ClaimsStateManager claimsStateManager) {
+  public BlocksClaim(ClaimsStateManager claimsStateManager, ClaimsManager claimsManager) {
     this.claimsStateManager = claimsStateManager;
+    this.claimsManager = claimsManager;
   }
 
   @EventHandler
@@ -46,5 +53,14 @@ public class BlocksClaim implements Listener {
   @EventHandler
   public void onItemChange(PlayerItemHeldEvent event) {
     claimsStateManager.stopClickSequence(event.getPlayer());
+  }
+
+  @EventHandler
+  public void onWalk(PlayerMoveEvent event) {
+    Player player = event.getPlayer();
+    Claim playerClaim = claimsManager.isPlayerInClaim(player);
+
+    if (playerClaim == null) return;
+
   }
 }

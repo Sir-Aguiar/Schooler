@@ -25,12 +25,7 @@ public class ClaimsStateManager {
   }
 
   public void addClickSequence(Player player, Block clickedBlock) {
-    List<Block> blockList = clickedSequence.get(player.getUniqueId());
-
-    if (blockList == null) {
-      blockList = new ArrayList<>();
-      clickedSequence.put(player.getUniqueId(), blockList);
-    }
+    List<Block> blockList = clickedSequence.computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>());
 
     if (blockList.size() < 2 && !blockList.contains(clickedBlock)) {
       blockList.add(clickedBlock);

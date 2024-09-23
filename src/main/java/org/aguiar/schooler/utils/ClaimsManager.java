@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class ClaimsManager {
   private final Plugin plugin;
@@ -25,12 +26,7 @@ public class ClaimsManager {
   }
 
   public void updatePlayerClaims(Player player, Claim newClaim) {
-    List<Claim> playerClaims = loadedData.claims().get(player.getUniqueId());
-
-    if (playerClaims == null) {
-      playerClaims = new ArrayList<>();
-      loadedData.claims().put(player.getUniqueId(), playerClaims);
-    }
+    List<Claim> playerClaims = loadedData.claims().computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>());
 
     playerClaims.add(newClaim);
     saveFile();
@@ -56,6 +52,32 @@ public class ClaimsManager {
     } catch (IOException e) {
       throw new RuntimeException(String.format("[%s] - COULDN'T READ THE 'claims.json'", plugin.getName()));
     }
+  }
+
+  public Claim isPlayerInClaim(Player player) {
+    UUID playerUUID = player.getUniqueId();
+    List<Claim> playerClaims = loadedData.claims().get(playerUUID);
+
+    if (playerClaims == null) {
+      return null;
+    }
+
+    int playerX = player.getLocation().getBlockX();
+    int playerZ = player.getLocation().getBlockZ();
+
+    for (Claim claim : playerClaims) {
+      int[][] claimedBlocks = claim.claimedBlocks();
+      int minX = claimedBlocks[0][0];
+      int maxX = claimedBlocks[0][1];
+      int minZ = claimedBlocks[1][0];
+      int maxZ = claimedBlocks[1][1];
+
+      if (playerX >= minX && playerX <= maxX && playerZ >= minZ && playerZ <= maxZ) {
+        return claim;
+      }
+    }
+
+    return null;
   }
 
 }
